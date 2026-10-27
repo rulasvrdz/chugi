@@ -1,5 +1,7 @@
-#Chugi
-##Loyalty App
 
-###Proyecto en construcion
-- RulasVrdz Lab
+# Chugi  
+**Loyalty App**
+
+
+### Proyecto en construcion
+> RulasVrdz Lab
