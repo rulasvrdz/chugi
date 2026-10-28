@@ -1,0 +1,8 @@
+.next
+node_modules
+pnpm-lock.yaml
+docs
+src/lib/supabase/database.types.ts
+CLAUDE.md
+README.md
+AGENTS.md
