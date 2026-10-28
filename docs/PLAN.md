@@ -260,6 +260,8 @@ Es para clientes cuyo celular no tiene NFC o lo tiene apagado. **Usa el mismo ca
 
 **Paso 0, obligatorio antes de cualquier cambio:** traer el esquema actual al repo con `supabase db pull`, como migración *baseline*, y escribir pruebas pgTAP que reproduzcan las 4 pruebas RLS de la sección 10. El documento dice que el SQL está "en la sección 8", pero esa sección no contiene SQL. Hoy la base es la única fuente de verdad.
 
+> **Hecho (CHUG-10):** el baseline vive en `supabase/migrations/20260807000000_baseline.sql` y las pruebas en `supabase/tests/`. Las diferencias con el documento (incluidos dos defectos de `request_redemption`) están en `configuracion-base-datos.md` §14.
+
 Todas las tablas están vacías (sección 12), así que borrar columnas o recrear el enum no tiene costo de migración de datos.
 
 ### 4.1 Qué sobra del diseño para app nativa y qué se queda
