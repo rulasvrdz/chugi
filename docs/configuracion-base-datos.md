@@ -282,3 +282,18 @@ grant execute on function public.mi_funcion(...) to authenticated; -- solo si co
 - 🔜 **Fase 3:** App React Native (Expo dev build) — enrolamiento, lectura NFC, cola offline cifrada (SQLite/MMKV) con sincronización en background.
 - 🔜 **Fase 4:** App de staff (escáner de código de canje) + panel web Next.js para gestión desde PC.
 - 🔜 **Fase 5:** Notificaciones push (sellos por vencer) + métricas para negocios.
+
+## 14. Baseline en el repo y diferencias con este documento (CHUG-10)
+
+El esquema aplicado en `sellos-app` vive ahora en `supabase/migrations/20260807000000_baseline.sql` (equivale a las tres migraciones ya aplicadas en producción: `initial_schema`, `tighten_function_permissions` y `fix_public_grant_on_rpc_functions`). Se reconstruyó desde el catálogo de producción con consultas de solo lectura y se verificó con una huella por categoría (columnas, constraints, índices, políticas, funciones, permisos, RLS, enums, trigger y extensiones): coincide con producción. Las pruebas viven en `supabase/tests/` y corren con `pnpm supabase test db`.
+
+Al escribir las pruebas aparecieron diferencias entre este documento y lo que realmente corre en producción. El baseline las reproduce sin corregirlas; las corrige una migración posterior.
+
+| # | Diferencia | Efecto | Dónde se corrige |
+| --- | --- | --- | --- |
+| 1 | `request_redemption` declara `RETURNS TABLE(redemption_id, code, expires_at)`, y esos nombres chocan con columnas de las consultas internas (`expires_at`, `redemption_id`). | Tras autorizar, la función falla con `42702` (referencia ambigua). **El canje no funciona hoy.** Las pruebas de la sección 10 nunca la ejercieron. | Reescritura de `request_redemption` (CHUG-19), o antes en CHUG-13 |
+| 2 | `request_redemption` y `confirm_redemption` llaman `gen_random_bytes`, `crypt` y `gen_salt` sin calificar, pero `pgcrypto` vive en el esquema `extensions` y las funciones fijan `search_path = public`. | Una vez corregido el punto 1, fallarían con `42883` (la función no existe). `confirm_redemption` ya falla así con un código válido. | Mismo cambio: calificar como `extensions.crypt(...)` o añadir `extensions` al `search_path` |
+| 3 | El código de canje es `base64` de 6 bytes (8 caracteres con `+`, `/` y `=`), no el código de 6 dígitos de `PLAN.md` §3.4. | Código poco amable para teclearlo en caja. | CHUG-19 |
+| 4 | Las políticas de `visits`, `enrollments`, `businesses`, `redemptions`, `business_members`, `locations` y `stamp_programs` aplican al rol `public` y llaman `is_member_of()`, que `anon` no puede ejecutar. | `anon` no recibe 0 filas: recibe un error de permiso (`42501`). Los datos siguen protegidos. `nfc_tags` y `audit_log` devuelven 0 filas (sin políticas). | Sin cambio necesario; queda cubierto por las pruebas |
+| 5 | La sección 9 describe "cliente" y "staff", pero las políticas están creadas `TO public`, no `TO authenticated`. | Funciona porque `auth.uid()` es nulo sin sesión; no es una barrera adicional. | Opcional, en una migración futura |
+| 6 | Las tablas conceden todos los privilegios a `anon`, `authenticated` y `service_role` (default privileges de Supabase). | La protección real es RLS, no los permisos de tabla. | Sin cambio |

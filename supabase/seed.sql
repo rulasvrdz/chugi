@@ -1,0 +1,1 @@
+-- Solo datos sintéticos para local. Se llena en CHUG-12 (alta de negocio y cuentas de prueba).

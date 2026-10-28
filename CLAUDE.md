@@ -23,14 +23,14 @@ Next.js (App Router, TypeScript strict) en Vercel · Supabase (`sellos-app`: Pos
 | Para qué | Comando |
 | --- | --- |
 | Instalar dependencias | `pnpm install` |
-| Supabase local (requiere Docker) | `pnpm supabase start` (CLI como devDependency; hasta CHUG-10 no hay `supabase/config.toml`) |
-| Reaplicar migraciones + seed local | `supabase db reset` |
+| Supabase local (requiere Docker) | `pnpm supabase start` (CLI como devDependency) |
+| Reaplicar migraciones + seed local | `pnpm supabase db reset` |
 | App en local | `pnpm dev` |
 | Lint / formato / tipos | `pnpm lint` · `pnpm format` (`format:check` en CI) · `pnpm typecheck` |
 | Pruebas unitarias | `pnpm test` |
-| Pruebas de base (RLS, RPC) | `supabase test db` |
+| Pruebas de base (RLS, RPC) | `pnpm supabase test db` |
 | Pruebas e2e de humo | `pnpm test:e2e` |
-| Nueva migración | `supabase migration new <descripcion>` |
+| Nueva migración | `pnpm supabase migration new <descripcion>` |
 | Tipos de la base | `pnpm db:types` (`supabase gen types typescript`) |
 
 **Despliegue:**
