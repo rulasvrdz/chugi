@@ -446,7 +446,7 @@ Costos en USD, estimados a oct 2026. **Hay que confirmar los precios vigentes al
 
 ## 8. Orden de construcción (rebanadas verticales)
 
-Cada rebanada termina en algo **desplegado y usable de punta a punta**, no en una capa suelta. Las claves `CHUGI-XX` se asignan al crear las stories en Jira. La lista es una propuesta de partición.
+Cada rebanada termina en algo **desplegado y usable de punta a punta**, no en una capa suelta. Las stories ya están creadas en Jira, en el proyecto `CHUG` (épicas CHUG-1 a CHUG-8, historias y tareas CHUG-9 a CHUG-45).
 
 **Día 1, fuera de código:** iniciar los trámites de Apple y Google, pedir los tags y el lector, y empezar el aviso de privacidad. **Durante el desarrollo:** iniciar el trámite de WhatsApp (Meta) y decidir el dominio de producción, que se necesitan en la rebanada 7.
 
