@@ -73,12 +73,12 @@ docs/
 - Las reglas de negocio críticas (1 sello por día, anti-replay, canje) viven **en la base** (constraints y RPC). La UI solo traduce resultados.
 - Los módulos que usan `service_role` empiezan con `import 'server-only'`.
 - Los tipos de la base se generan (`pnpm db:types`), no se escriben a mano.
-- Commits: `tipo(CHUGI-XX): descripción` (`feat`, `fix`, `chore`, `docs`, `test`, `refactor`).
+- Commits: `tipo(CHUG-XX): descripción` (`feat`, `fix`, `chore`, `docs`, `test`, `refactor`).
 
 ## Flujo de Git
 
-- **Una story de Jira = una rama `feature/CHUGI-XX-descripcion-corta` = un PR hacia `dev`.**
-- Las ramas salen de `dev` actualizado. Para bugs: `fix/CHUGI-XX-…`. Para documentación sin story: `docs/…`.
+- **Una story de Jira = una rama `feature/CHUG-XX-descripcion-corta` = un PR hacia `dev`.**
+- Las ramas salen de `dev` actualizado. Para bugs: `fix/CHUG-XX-…`. Para documentación sin story: `docs/…`.
 - **Nunca hacer push directo a `main` ni a `dev`.** `dev → main` es un PR que aprueba Raúl.
 - No se hace commit, push ni PR sin aprobación explícita de Raúl en la sesión.
 
