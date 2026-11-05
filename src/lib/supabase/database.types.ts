@@ -540,6 +540,7 @@ export type Database = {
         Args: { p_counter: number; p_tag_id: string }
         Returns: string
       }
+      get_sdm_app_key: { Args: { p_key_ref: string }; Returns: string }
       get_sdm_keys: {
         Args: { p_key_ref: string }
         Returns: {

@@ -13,7 +13,8 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "db:types": "supabase gen types typescript --local > src/lib/supabase/database.types.ts",
-    "business:create": "tsx scripts/create-business.ts"
+    "business:create": "tsx scripts/create-business.ts",
+    "tag:program": "tsx scripts/program-tag.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
