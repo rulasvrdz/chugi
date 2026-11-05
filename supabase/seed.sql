@@ -1,1 +1,4 @@
--- Solo datos sintéticos para local. Se llena en CHUG-12 (alta de negocio y cuentas de prueba).
+-- Sin datos de semilla a propósito.
+-- Los negocios y las cuentas del panel se crean con `pnpm business:create` (CHUG-12), apuntando
+-- a Supabase local; así el seed no depende del esquema interno de auth, que varía entre
+-- la imagen de la base y el stack completo. Nunca se cargan datos reales aquí.

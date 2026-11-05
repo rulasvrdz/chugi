@@ -1,7 +1,7 @@
 -- Aislamiento de RLS: las 4 pruebas de docs/configuracion-base-datos.md §10
 -- más casos negativos. Datos sintéticos; todo se revierte con rollback.
 begin;
-select plan(28);
+select plan(33);
 
 -- Datos -------------------------------------------------------------------------------
 -- ids fijos: usuarios 1x, negocios 2x, resto 3x
@@ -51,6 +51,8 @@ select is((select count(*) from public.visits)::int, 0, '1. cliente ajeno: 0 vis
 select is((select count(*) from public.enrollments)::int, 0, '1. cliente ajeno: 0 enrollments');
 select is((select count(*) from public.nfc_tags)::int, 0, '1. cliente ajeno: 0 nfc_tags');
 select is((select count(*) from public.businesses)::int, 0, '1. cliente ajeno: 0 businesses');
+select is((select count(*) from public.business_members)::int, 0, '1. cliente ajeno: 0 business_members');
+select is((select count(*) from public.locations)::int, 0, '1. cliente ajeno: 0 locations');
 
 -- 2. Cliente dueño de la visita (cliente_a) ------------------------------------------
 select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-000000000011', true);
@@ -80,6 +82,9 @@ select is((select count(*) from public.audit_log)::int, 0, 'staff: 0 audit_log')
 select is_empty(
   $$update public.stamp_programs set stamps_required = 1 returning id$$,
   'staff no puede editar stamp_programs');
+select is_empty(
+  $$update public.businesses set name = 'Editado por staff' returning id$$,
+  'staff no puede editar businesses');
 select throws_ok(
   $$insert into public.business_members (business_id, user_id, role)
     values ('00000000-0000-0000-0000-000000000021', '00000000-0000-0000-0000-000000000012', 'owner')$$,
@@ -90,6 +95,9 @@ select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-000000000014
 select isnt_empty(
   $$update public.stamp_programs set reward_description = 'Postre gratis' returning id$$,
   'manager sí puede editar stamp_programs');
+select isnt_empty(
+  $$update public.businesses set name = 'Negocio X (editado)' returning id$$,
+  'manager sí puede editar businesses');
 
 -- Staff de otro negocio (staff_y): no ve datos del negocio X --------------------------
 select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-000000000015', true);
@@ -97,6 +105,7 @@ select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-000000000015
 select is((select count(*) from public.visits)::int, 0, 'staff de otro negocio: 0 visits');
 select is((select count(*) from public.enrollments)::int, 0, 'staff de otro negocio: 0 enrollments');
 select is((select count(*) from public.businesses)::int, 1, 'staff de otro negocio: solo ve su negocio');
+select is((select count(*) from public.business_members)::int, 1, 'staff de otro negocio: solo ve sus miembros');
 
 -- anon (sin sesión) ------------------------------------------------------------------
 reset role;
