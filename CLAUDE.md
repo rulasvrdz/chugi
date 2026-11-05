@@ -1,7 +1,7 @@
 # CLAUDE.md: Chugi
 
 ## Pruebas
-Para hacer pruebas del codigo estan las credenciales en el documento @test-credentials.md
+Las credenciales de las cuentas de prueba (dueño y caja) están en @test-credentials.md. Son solo de prueba y sin valor real; las credenciales reales nunca se suben al repo.
 
 ## Qué es Chugi
 
@@ -80,12 +80,11 @@ docs/
 
 ## Flujo de Git
 
-- **Una story de Jira = una rama `feature/CHUG-XX-descripcion-corta` = un PR hacia `dev`.**
+- **Una story de Jira = una rama `feature/CHUG-XX-descripcion-corta`**, que se integra a `dev` **sin PR**.
 - Las ramas salen de `dev` actualizado. Para bugs: `fix/CHUG-XX-…`. Para documentación sin story: `docs/…`.
-- **Nunca hacer push directo a `main` es un PR que aprueba Raúl.
-- Al terminar la tarea del jira, hacer push a dev y agregar los comments a la tarea de jira.
-- Aplicar las migraciones necesarias, solo notificar al final que migracion se hizo y que modifico.
-- **Temporal, hasta nuevo aviso (2026-11-05):** Raúl autorizó commits y push directo a `dev` en las sesiones de Fundaciones (CHUG-12 y CHUG-13), sin rama `feature/` ni PR. `main` sigue protegida: solo se actualiza con el PR `dev → main` que aprueba Raúl.
+- Al terminar la tarea: commit, push a `dev` y comentario en la tarea de Jira. No hace falta pedir aprobación previa a Raúl para ese commit y push.
+- **Nunca hacer push directo a `main`.** `dev → main` es un PR que aprueba Raúl.
+- Las migraciones necesarias se aplican solo en el entorno de dev (hoy `sellos-app`, después `sellos-app-dev`), con el CI en verde. Al final se informa qué migración se aplicó y qué modificó. Producción sigue siendo solo de Raúl.
 
 ## Seguridad (no negociable)
 
