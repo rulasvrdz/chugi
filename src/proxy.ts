@@ -48,8 +48,8 @@ export async function proxy(request: NextRequest) {
   return response;
 }
 
-// Solo las rutas con login. Se amplía cuando existan las pantallas del cliente
-// (/registro, /tarjeta, /sello).
+// Solo las rutas con login. Se amplía cuando existan más pantallas del cliente (/tarjeta).
+// /sello y /registro lo necesitan para refrescar la sesión del cliente; no exigen login.
 export const config = {
-  matcher: ['/login', '/panel/:path*', '/caja/:path*'],
+  matcher: ['/login', '/panel/:path*', '/caja/:path*', '/sello', '/registro'],
 };
