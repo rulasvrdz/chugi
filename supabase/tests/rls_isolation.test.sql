@@ -12,9 +12,9 @@ insert into auth.users (id, email) values
   ('00000000-0000-0000-0000-000000000014', 'manager_x@test.invalid'),
   ('00000000-0000-0000-0000-000000000015', 'staff_y@test.invalid');
 
-insert into public.businesses (id, name) values
-  ('00000000-0000-0000-0000-000000000021', 'Negocio X'),
-  ('00000000-0000-0000-0000-000000000022', 'Negocio Y');
+insert into public.businesses (id, name, slug) values
+  ('00000000-0000-0000-0000-000000000021', 'Negocio X', 'negocio-x'),
+  ('00000000-0000-0000-0000-000000000022', 'Negocio Y', 'negocio-y');
 
 insert into public.business_members (business_id, user_id, role) values
   ('00000000-0000-0000-0000-000000000021', '00000000-0000-0000-0000-000000000013', 'staff'),
@@ -36,10 +36,10 @@ insert into public.enrollments (id, business_id, customer_id) values
    '00000000-0000-0000-0000-000000000011');
 
 insert into public.visits (business_id, enrollment_id, location_id, tag_id, stamp_program_id,
-                           sdm_counter, status, captured_at, expires_at) values
+                           sdm_counter, status, expires_at) values
   ('00000000-0000-0000-0000-000000000021', '00000000-0000-0000-0000-000000000034',
    '00000000-0000-0000-0000-000000000031', '00000000-0000-0000-0000-000000000032',
-   '00000000-0000-0000-0000-000000000033', 1, 'confirmed', now(), now() + interval '90 days');
+   '00000000-0000-0000-0000-000000000033', 1, 'confirmed', now() + interval '90 days');
 
 insert into public.audit_log (action, target_table) values ('test', 'visits');
 
@@ -62,10 +62,10 @@ select is((select count(*) from public.nfc_tags)::int, 0, '2. cliente dueño: 0 
 -- 4. INSERT directo en visits por el cliente (visits solo la escribe service_role) --
 select throws_ok(
   $$insert into public.visits (business_id, enrollment_id, location_id, tag_id, stamp_program_id,
-                               sdm_counter, status, captured_at, expires_at)
+                               sdm_counter, status, expires_at)
     values ('00000000-0000-0000-0000-000000000021', '00000000-0000-0000-0000-000000000034',
             '00000000-0000-0000-0000-000000000031', '00000000-0000-0000-0000-000000000032',
-            '00000000-0000-0000-0000-000000000033', 99, 'confirmed', now(), now() + interval '90 days')$$,
+            '00000000-0000-0000-0000-000000000033', 99, 'confirmed', now() + interval '90 days')$$,
   '42501', null, '4. cliente: INSERT directo en visits rechazado por RLS');
 
 -- 3. Staff del negocio X (staff_x) ----------------------------------------------------

@@ -15,7 +15,8 @@ insert into auth.users (id, email) values
   ('00000000-0000-0000-0000-000000000012', 'cliente_b@test.invalid'),
   ('00000000-0000-0000-0000-000000000013', 'staff_x@test.invalid');
 
-insert into public.businesses (id, name) values ('00000000-0000-0000-0000-000000000021', 'Negocio X');
+insert into public.businesses (id, name, slug) values
+  ('00000000-0000-0000-0000-000000000021', 'Negocio X', 'negocio-x');
 insert into public.business_members (business_id, user_id, role) values
   ('00000000-0000-0000-0000-000000000021', '00000000-0000-0000-0000-000000000013', 'staff');
 insert into public.locations (id, business_id, name, lat, lng) values
@@ -31,10 +32,10 @@ insert into public.enrollments (id, business_id, customer_id) values
 
 -- Una visita confirmada: no alcanza para el premio (se requieren 2)
 insert into public.visits (business_id, enrollment_id, location_id, tag_id, stamp_program_id,
-                           sdm_counter, status, captured_at, expires_at) values
+                           sdm_counter, status, expires_at) values
   ('00000000-0000-0000-0000-000000000021', '00000000-0000-0000-0000-000000000034',
    '00000000-0000-0000-0000-000000000031', '00000000-0000-0000-0000-000000000032',
-   '00000000-0000-0000-0000-000000000033', 1, 'confirmed', now(), now() + interval '90 days');
+   '00000000-0000-0000-0000-000000000033', 1, 'confirmed', now() + interval '90 days');
 
 set local role authenticated;
 
@@ -49,12 +50,14 @@ select throws_ok(
   '42702', null, 'defecto conocido: request_redemption falla con referencia ambigua a expires_at');
 
 reset role;
--- Segunda visita: con sellos suficientes el resultado es el mismo defecto (42702).
+-- Segunda visita, de otro día (el índice visits_one_per_day permite 1 sello por día):
+-- con sellos suficientes el resultado es el mismo defecto (42702).
 insert into public.visits (business_id, enrollment_id, location_id, tag_id, stamp_program_id,
-                           sdm_counter, status, captured_at, expires_at) values
+                           sdm_counter, status, created_at, expires_at) values
   ('00000000-0000-0000-0000-000000000021', '00000000-0000-0000-0000-000000000034',
    '00000000-0000-0000-0000-000000000031', '00000000-0000-0000-0000-000000000032',
-   '00000000-0000-0000-0000-000000000033', 2, 'confirmed', now(), now() + interval '90 days');
+   '00000000-0000-0000-0000-000000000033', 2, 'confirmed', now() - interval '2 days',
+   now() + interval '90 days');
 
 set local role authenticated;
 select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-000000000011', true);
