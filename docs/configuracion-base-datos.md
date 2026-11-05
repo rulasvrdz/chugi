@@ -326,3 +326,21 @@ La migración `supabase/migrations/20261105025021_delta_1.sql` adapta el esquema
 **`get_advisors` después de la migración:** sin WARN nuevos. Siguen los 4 WARN de `authenticated_security_definer_function_executable` (`is_member_of`, `is_manager_of`, `request_redemption`, `confirm_redemption`), que son intencionales. Aparece un INFO nuevo, `rls_enabled_no_policy` en `tap_claims`, también intencional (deny-by-default). Los WARN de rendimiento `auth_rls_initplan` y `multiple_permissive_policies` vienen del baseline.
 
 **Versiones de migración.** `sellos-app` registra tres migraciones con los timestamps originales (`20260807204143`, `20260808000234`, `20260808035003`), mientras que el repo las agrupa en `20260807000000_baseline.sql`. Antes del primer `supabase db push` contra un proyecto ya migrado hay que alinear el historial con `supabase migration repair`.
+
+## 16. Llave 0 de los tags en Vault (CHUG-14)
+
+La migración `supabase/migrations/20261105065324_sdm_app_key.sql` agrega `get_sdm_app_key(p_key_ref text)`, que lee el secreto `sdm_app_master_<key_ref>` de Vault. Es la llave maestra de aplicación (key 0) de los tags NTAG 424 DNA: la única que permite reconfigurarlos. Va en un secreto aparte de `sdm_meta_<ref>` y `sdm_file_master_<ref>` (los que lee `/t` en cada tap), de modo que filtrar lo que usa el servidor no basta para reprogramar tags.
+
+- `SECURITY DEFINER`, `search_path` fijo, `revoke … from public, anon, authenticated` y `grant … to service_role`. Solo la usa `scripts/program-tag.ts`.
+- Si falta el secreto, lanza `sdm app key not found`.
+- Pruebas: `supabase/tests/sdm_app_key.test.sql`.
+
+**Secretos por versión de llaves (`<ref>`)**, cada uno de 32 caracteres hexadecimales (AES-128). Se crean una vez, desde el SQL editor del proyecto, sin pasar por el repo ni por la terminal:
+
+```sql
+select vault.create_secret('<32 hex aleatorios>', 'sdm_meta_<ref>');
+select vault.create_secret('<32 hex aleatorios>', 'sdm_file_master_<ref>');
+select vault.create_secret('<32 hex aleatorios>', 'sdm_app_master_<ref>');
+```
+
+Genera cada valor con `openssl rand -hex 16`. Respalda las tres llaves en un gestor de contraseñas: sin ellas los tags programados con esa versión no se pueden volver a configurar.
