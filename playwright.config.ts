@@ -14,10 +14,14 @@ export default defineConfig({
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
+    // Por defecto valores ficticios (el CI no se conecta a Supabase). Para las pruebas que
+    // sí lo usan (stamp.spec.ts), E2E_SUPABASE_* apunta la app al mismo proyecto.
     env: {
-      NEXT_PUBLIC_SUPABASE_URL: 'https://example.supabase.co',
-      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: 'dummy',
-      SUPABASE_SECRET_KEY: 'dummy',
+      NEXT_PUBLIC_SUPABASE_URL:
+        process.env.E2E_SUPABASE_URL ?? 'https://example.supabase.co',
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:
+        process.env.E2E_SUPABASE_PUBLISHABLE_KEY ?? 'dummy',
+      SUPABASE_SECRET_KEY: process.env.E2E_SUPABASE_SECRET_KEY ?? 'dummy',
     },
   },
 });
