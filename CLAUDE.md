@@ -1,5 +1,8 @@
 # CLAUDE.md: Chugi
 
+## Pruebas
+Para hacer pruebas del codigo estan las credenciales en el documento @test-credentials.md
+
 ## Qué es Chugi
 
 Plataforma de lealtad para negocios físicos: el cliente acerca su celular a un sello NFC en caja y suma una visita **sin descargar nada**.
@@ -79,8 +82,9 @@ docs/
 
 - **Una story de Jira = una rama `feature/CHUG-XX-descripcion-corta` = un PR hacia `dev`.**
 - Las ramas salen de `dev` actualizado. Para bugs: `fix/CHUG-XX-…`. Para documentación sin story: `docs/…`.
-- **Nunca hacer push directo a `main` ni a `dev`.** `dev → main` es un PR que aprueba Raúl.
-- No se hace commit, push ni PR sin aprobación explícita de Raúl en la sesión.
+- **Nunca hacer push directo a `main` es un PR que aprueba Raúl.
+- Al terminar la tarea del jira, hacer push a dev y agregar los comments a la tarea de jira.
+- Aplicar las migraciones necesarias, solo notificar al final que migracion se hizo y que modifico.
 - **Temporal, hasta nuevo aviso (2026-11-05):** Raúl autorizó commits y push directo a `dev` en las sesiones de Fundaciones (CHUG-12 y CHUG-13), sin rama `feature/` ni PR. `main` sigue protegida: solo se actualiza con el PR `dev → main` que aprueba Raúl.
 
 ## Seguridad (no negociable)
