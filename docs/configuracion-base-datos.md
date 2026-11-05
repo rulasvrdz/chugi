@@ -334,6 +334,7 @@ La migración `supabase/migrations/20261105065324_sdm_app_key.sql` agrega `get_s
 - `SECURITY DEFINER`, `search_path` fijo, `revoke … from public, anon, authenticated` y `grant … to service_role`. Solo la usa `scripts/program-tag.ts`.
 - Si falta el secreto, lanza `sdm app key not found`.
 - Pruebas: `supabase/tests/sdm_app_key.test.sql`.
+- Se aplicó en `sellos-app` el 2026-11-05 con el MCP de Supabase; allí quedó registrada con la versión `20261105073132` (en el repo es `20261105065324`). `get_advisors`: sin WARN nuevos.
 
 **Secretos por versión de llaves (`<ref>`)**, cada uno de 32 caracteres hexadecimales (AES-128). Se crean una vez, desde el SQL editor del proyecto, sin pasar por el repo ni por la terminal:
 
