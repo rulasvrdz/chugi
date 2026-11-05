@@ -78,22 +78,37 @@ export type Database = {
       }
       businesses: {
         Row: {
+          brand_color: string | null
           created_at: string
+          google_review_url: string | null
           id: string
+          logo_path: string | null
           name: string
+          slug: string
           status: string
+          timezone: string
         }
         Insert: {
+          brand_color?: string | null
           created_at?: string
+          google_review_url?: string | null
           id?: string
+          logo_path?: string | null
           name: string
+          slug: string
           status?: string
+          timezone?: string
         }
         Update: {
+          brand_color?: string | null
           created_at?: string
+          google_review_url?: string | null
           id?: string
+          logo_path?: string | null
           name?: string
+          slug?: string
           status?: string
+          timezone?: string
         }
         Relationships: []
       }
@@ -130,28 +145,25 @@ export type Database = {
         Row: {
           business_id: string
           created_at: string
-          geofence_radius_m: number
           id: string
-          lat: number
-          lng: number
+          lat: number | null
+          lng: number | null
           name: string
         }
         Insert: {
           business_id: string
           created_at?: string
-          geofence_radius_m?: number
           id?: string
-          lat: number
-          lng: number
+          lat?: number | null
+          lng?: number | null
           name: string
         }
         Update: {
           business_id?: string
           created_at?: string
-          geofence_radius_m?: number
           id?: string
-          lat?: number
-          lng?: number
+          lat?: number | null
+          lng?: number | null
           name?: string
         }
         Relationships: [
@@ -215,21 +227,30 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string
-          full_name: string | null
+          deletion_notice_sent_at: string | null
+          first_name: string | null
           id: string
-          phone: string | null
+          last_activity_at: string
+          privacy_accepted_at: string | null
+          privacy_notice_version: string | null
         }
         Insert: {
           created_at?: string
-          full_name?: string | null
+          deletion_notice_sent_at?: string | null
+          first_name?: string | null
           id: string
-          phone?: string | null
+          last_activity_at?: string
+          privacy_accepted_at?: string | null
+          privacy_notice_version?: string | null
         }
         Update: {
           created_at?: string
-          full_name?: string | null
+          deletion_notice_sent_at?: string | null
+          first_name?: string | null
           id?: string
-          phone?: string | null
+          last_activity_at?: string
+          privacy_accepted_at?: string | null
+          privacy_notice_version?: string | null
         }
         Relationships: []
       }
@@ -332,57 +353,125 @@ export type Database = {
           },
         ]
       }
+      tap_claims: {
+        Row: {
+          business_id: string
+          consumed_at: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          issued_by: string | null
+          location_id: string
+          qr_jti: string | null
+          result: string | null
+          sdm_counter: number | null
+          source: string
+          tag_id: string | null
+          visit_id: string | null
+        }
+        Insert: {
+          business_id: string
+          consumed_at?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          issued_by?: string | null
+          location_id: string
+          qr_jti?: string | null
+          result?: string | null
+          sdm_counter?: number | null
+          source: string
+          tag_id?: string | null
+          visit_id?: string | null
+        }
+        Update: {
+          business_id?: string
+          consumed_at?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          issued_by?: string | null
+          location_id?: string
+          qr_jti?: string | null
+          result?: string | null
+          sdm_counter?: number | null
+          source?: string
+          tag_id?: string | null
+          visit_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tap_claims_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tap_claims_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tap_claims_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "nfc_tags"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tap_claims_visit_id_fkey"
+            columns: ["visit_id"]
+            isOneToOne: false
+            referencedRelation: "visits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       visits: {
         Row: {
           business_id: string
-          captured_at: string
           created_at: string
           enrollment_id: string
           expires_at: string
           id: string
-          lat: number | null
-          lng: number | null
           location_id: string
           redemption_id: string | null
-          sdm_counter: number
+          sdm_counter: number | null
+          stamp_date: string
           stamp_program_id: string
           status: Database["public"]["Enums"]["visit_status"]
-          synced_at: string | null
-          tag_id: string
+          tag_id: string | null
         }
         Insert: {
           business_id: string
-          captured_at: string
           created_at?: string
           enrollment_id: string
           expires_at: string
           id?: string
-          lat?: number | null
-          lng?: number | null
           location_id: string
           redemption_id?: string | null
-          sdm_counter: number
+          sdm_counter?: number | null
+          stamp_date: string
           stamp_program_id: string
           status?: Database["public"]["Enums"]["visit_status"]
-          synced_at?: string | null
-          tag_id: string
+          tag_id?: string | null
         }
         Update: {
           business_id?: string
-          captured_at?: string
           created_at?: string
           enrollment_id?: string
           expires_at?: string
           id?: string
-          lat?: number | null
-          lng?: number | null
           location_id?: string
           redemption_id?: string | null
-          sdm_counter?: number
+          sdm_counter?: number | null
+          stamp_date?: string
           stamp_program_id?: string
           status?: Database["public"]["Enums"]["visit_status"]
-          synced_at?: string | null
-          tag_id?: string
+          tag_id?: string | null
         }
         Relationships: [
           {
@@ -438,6 +527,35 @@ export type Database = {
         Args: { p_code: string; p_redemption_id: string }
         Returns: boolean
       }
+      create_qr_claim: {
+        Args: {
+          p_business_id: string
+          p_issued_by: string
+          p_jti: string
+          p_location_id: string
+        }
+        Returns: string
+      }
+      create_tap_claim: {
+        Args: { p_counter: number; p_tag_id: string }
+        Returns: string
+      }
+      get_sdm_keys: {
+        Args: { p_key_ref: string }
+        Returns: {
+          file_master_key: string
+          meta_key: string
+        }[]
+      }
+      grant_stamp: {
+        Args: { p_claim_id: string; p_user_id: string }
+        Returns: {
+          claim_result: string
+          reward: string
+          stamps_count: number
+          stamps_target: number
+        }[]
+      }
       is_manager_of: { Args: { p_business_id: string }; Returns: boolean }
       is_member_of: { Args: { p_business_id: string }; Returns: boolean }
       request_redemption: {
@@ -454,7 +572,7 @@ export type Database = {
       program_status: "active" | "inactive"
       redemption_status: "pending" | "redeemed" | "expired"
       tag_status: "active" | "revoked"
-      visit_status: "pending_sync" | "confirmed" | "rejected" | "duplicate"
+      visit_status: "confirmed" | "voided"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -586,7 +704,7 @@ export const Constants = {
       program_status: ["active", "inactive"],
       redemption_status: ["pending", "redeemed", "expired"],
       tag_status: ["active", "revoked"],
-      visit_status: ["pending_sync", "confirmed", "rejected", "duplicate"],
+      visit_status: ["confirmed", "voided"],
     },
   },
 } as const

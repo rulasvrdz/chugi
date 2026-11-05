@@ -297,3 +297,32 @@ Al escribir las pruebas aparecieron diferencias entre este documento y lo que re
 | 4 | Las políticas de `visits`, `enrollments`, `businesses`, `redemptions`, `business_members`, `locations` y `stamp_programs` aplican al rol `public` y llaman `is_member_of()`, que `anon` no puede ejecutar. | `anon` no recibe 0 filas: recibe un error de permiso (`42501`). Los datos siguen protegidos. `nfc_tags` y `audit_log` devuelven 0 filas (sin políticas). | Sin cambio necesario; queda cubierto por las pruebas |
 | 5 | La sección 9 describe "cliente" y "staff", pero las políticas están creadas `TO public`, no `TO authenticated`. | Funciona porque `auth.uid()` es nulo sin sesión; no es una barrera adicional. | Opcional, en una migración futura |
 | 6 | Las tablas conceden todos los privilegios a `anon`, `authenticated` y `service_role` (default privileges de Supabase). | La protección real es RLS, no los permisos de tabla. | Sin cambio |
+
+## 15. Delta 1 en el repo y diferencias con PLAN.md (CHUG-13)
+
+La migración `supabase/migrations/20261105025021_delta_1.sql` adapta el esquema al piloto web (`PLAN.md` §4.1 a §4.4). Se aplicó en `sellos-app` el 2026-11-05 (el entorno de desarrollo mientras no exista `sellos-app-dev`) y quedó registrada con la versión `20261105025021`. Las pruebas viven en `supabase/tests/delta_1.test.sql`.
+
+**Qué cambió**
+
+- `visit_status` = (`confirmed`, `voided`). Se eliminan `visits.captured_at`, `synced_at`, `lat`, `lng`, `locations.geofence_radius_m` y `profiles.phone`. `profiles.full_name` pasa a `first_name`. `handle_new_user` guarda `first_name` (recortado a 50 caracteres) desde la metadata.
+- `businesses`: `timezone` (validada al guardar), `slug` (único, solo minúsculas, números y guiones), `brand_color`, `logo_path` y `google_review_url` (solo `https://`). `profiles`: `privacy_notice_version`, `privacy_accepted_at`, `last_activity_at` y `deletion_notice_sent_at`.
+- `visits.stamp_date` calculado por trigger en la zona del negocio e índice único parcial `visits_one_per_day (enrollment_id, stamp_date) WHERE status = 'confirmed'`.
+- Tabla `tap_claims` y RPCs `create_tap_claim`, `create_qr_claim`, `get_sdm_keys` y `grant_stamp`, ejecutables solo por `service_role`.
+
+**Decisiones que difieren de `PLAN.md`**
+
+| # | Decisión | Razón |
+| --- | --- | --- |
+| 1 | El trigger de `stamp_date` calcula con `created_at` (default `now()`), no con `now()` directo. | Es el mismo valor en producción y permite probar 23:59 contra 00:01 en pgTAP. Solo `service_role` escribe `visits` y `grant_stamp` nunca manda `created_at`. El trigger también dispara en `UPDATE OF created_at, business_id`. |
+| 2 | `visits.sdm_counter` también es nullable, con `CHECK ((tag_id is null) = (sdm_counter is null))`. | Los sellos por QR no tienen tag ni contador. |
+| 3 | `grant_stamp` devuelve `(claim_result, stamps_count, stamps_target, reward)`, no `(result, …, stamps_required, …)`. | Los nombres de salida chocan con columnas de las tablas y provocan el error `42702` (referencia ambigua) descrito en §14. |
+| 4 | `anon` y `authenticated` no tienen permisos de tabla sobre `tap_claims`. | Leerla da `42501` (permiso denegado) en lugar de 0 filas. |
+| 5 | Nombres de las llaves SDM en Vault: `sdm_meta_<key_ref>` y `sdm_file_master_<key_ref>`. | Convención que lee `get_sdm_keys`. Si falta alguna, lanza `sdm keys not found`. |
+| 6 | CHECKs adicionales: `tap_claims (consumed_at is null) = (result is null)` y los de forma por `source` (`nfc` exige tag y contador; `qr` exige `qr_jti` y prohíbe tag). | Estados imposibles se rechazan en la base. |
+| 7 | `grant_stamp` no consume el claim si no hay programa activo y solo traduce a `already_today` el choque de `visits_one_per_day`; cualquier otro `unique_violation` se relanza. | Un claim no se pierde por un error de configuración, y un replay de contador no se disfraza de tope diario. |
+
+**Pendiente de §14** (no se tocó en CHUG-13): los defectos 1 a 3 de `request_redemption` y `confirm_redemption` siguen vigentes; se corrigen en CHUG-20 y CHUG-21 junto con el código de 6 dígitos.
+
+**`get_advisors` después de la migración:** sin WARN nuevos. Siguen los 4 WARN de `authenticated_security_definer_function_executable` (`is_member_of`, `is_manager_of`, `request_redemption`, `confirm_redemption`), que son intencionales. Aparece un INFO nuevo, `rls_enabled_no_policy` en `tap_claims`, también intencional (deny-by-default). Los WARN de rendimiento `auth_rls_initplan` y `multiple_permissive_policies` vienen del baseline.
+
+**Versiones de migración.** `sellos-app` registra tres migraciones con los timestamps originales (`20260807204143`, `20260808000234`, `20260808035003`), mientras que el repo las agrupa en `20260807000000_baseline.sql`. Antes del primer `supabase db push` contra un proyecto ya migrado hay que alinear el historial con `supabase migration repair`.

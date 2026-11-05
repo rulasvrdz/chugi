@@ -262,6 +262,8 @@ Es para clientes cuyo celular no tiene NFC o lo tiene apagado. **Usa el mismo ca
 
 > **Hecho (CHUG-10):** el baseline vive en `supabase/migrations/20260807000000_baseline.sql` y las pruebas en `supabase/tests/`. Las diferencias con el documento (incluidos dos defectos de `request_redemption`) están en `configuracion-base-datos.md` §14.
 
+> **Hecho (CHUG-13):** la delta 1 (§4.1 a §4.4) vive en `supabase/migrations/20261105025021_delta_1.sql`, con pruebas en `supabase/tests/delta_1.test.sql`. Quedan fuera `wallet_passes`, `apple_device_registrations`, `promotions`, `confirm_redemption_by_code` y `business_dashboard`, que llegan con sus stories. Las decisiones que difieren de este documento (por ejemplo, los nombres de salida de `grant_stamp`) están en `configuracion-base-datos.md` §15.
+
 Todas las tablas están vacías (sección 12), así que borrar columnas o recrear el enum no tiene costo de migración de datos.
 
 ### 4.1 Qué sobra del diseño para app nativa y qué se queda

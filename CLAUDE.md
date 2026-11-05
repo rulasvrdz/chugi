@@ -31,6 +31,7 @@ Next.js (App Router, TypeScript strict) en Vercel · Supabase (`sellos-app`: Pos
 | Pruebas de base (RLS, RPC) | `pnpm supabase test db` |
 | Pruebas e2e de humo | `pnpm test:e2e` |
 | Nueva migración | `pnpm supabase migration new <descripcion>` |
+| Alta de negocio y cuentas (dueño + caja) | `pnpm business:create --name … --slug … --location … --owner-email … --caja-email …` (lee `.env.local`; imprime las contraseñas una sola vez) |
 | Tipos de la base | `pnpm db:types` (`supabase gen types typescript`) |
 
 **Despliegue:**
@@ -39,6 +40,7 @@ Next.js (App Router, TypeScript strict) en Vercel · Supabase (`sellos-app`: Pos
 - La rama `dev` se publica en **`chugi.rulasvrdz.com`** (DNS en Cloudflare, modo "DNS only"), también con `sellos-app-dev`.
 - Un merge a `main` despliega a producción (`sellos-app`, dominio por definir).
 - Las migraciones a producción (`sellos-app`) **solo las aplica Raúl**, después del merge a `main`. Claude nunca aplica migraciones ni ejecuta SQL de escritura contra producción, ni por CLI ni por MCP.
+- **Temporal, hasta nuevo aviso (indicado por Raúl el 2026-11-05):** `sellos-app` hace de entorno de desarrollo porque aún no existe `sellos-app-dev`. Mientras no haya clientes reales ni datos reales, Claude puede aplicar migraciones ahí con el MCP de Supabase, después de que el CI esté en verde. Al crear `sellos-app-dev` o cargar datos reales, esta excepción termina y vuelve a regir la regla anterior.
 
 ## Estructura de carpetas
 
@@ -79,6 +81,7 @@ docs/
 - Las ramas salen de `dev` actualizado. Para bugs: `fix/CHUG-XX-…`. Para documentación sin story: `docs/…`.
 - **Nunca hacer push directo a `main` ni a `dev`.** `dev → main` es un PR que aprueba Raúl.
 - No se hace commit, push ni PR sin aprobación explícita de Raúl en la sesión.
+- **Temporal, hasta nuevo aviso (2026-11-05):** Raúl autorizó commits y push directo a `dev` en las sesiones de Fundaciones (CHUG-12 y CHUG-13), sin rama `feature/` ni PR. `main` sigue protegida: solo se actualiza con el PR `dev → main` que aprueba Raúl.
 
 ## Seguridad (no negociable)
 
